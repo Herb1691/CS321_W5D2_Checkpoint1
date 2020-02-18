@@ -21,8 +21,15 @@ namespace CS321_W5D2_BlogAPI.Core.Services
         {
             // TODO: Prevent users from adding to a blog that isn't theirs
             //     Use the _userService to get the current users id.
+            var currentUserId = _userService.CurrentUserId;
             //     You may have to retrieve the blog in order to check user id
+            var blog = _blogRepository.Get(newPost.BlogId);
             // TODO: assign the current date to DatePublished
+            if (blog.UserId != currentUserId)
+            {
+                //Models
+            }
+            newPost.DatePublished = DateTime.Now;
             return _postRepository.Add(newPost);
         }
 
