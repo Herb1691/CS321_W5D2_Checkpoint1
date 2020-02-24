@@ -25,12 +25,15 @@ namespace CS321_W5D2_BlogAPI.Core.Services
             //     You may have to retrieve the blog in order to check user id
             var blog = _blogRepository.Get(newPost.BlogId);
             // TODO: assign the current date to DatePublished
-            if (blog.UserId != currentUserId)
+            if (blog.UserId == currentUserId)
             {
                 //Models
+                newPost.DatePublished = DateTime.Now;
+                _postRepository.Add(newPost);
+                return newPost;
             }
-            newPost.DatePublished = DateTime.Now;
-            return _postRepository.Add(newPost);
+            else
+                throw new ApplicationException("Not allowed to post to another users blog.");
         }
 
         public Post Get(int id)
@@ -50,15 +53,32 @@ namespace CS321_W5D2_BlogAPI.Core.Services
 
         public void Remove(int id)
         {
-            var post = this.Get(id);
+            //     Use the _userService to get the current users id.
+            var currentUserId = _userService.CurrentUserId;
+            //     You may have to retrieve the blog in order to check user id
+            var blog = _blogRepository.Get(id);
             // TODO: prevent user from deleting from a blog that isn't theirs
-            _postRepository.Remove(id);
+            if (blog.UserId == currentUserId)
+            {
+                _postRepository.Remove(id);
+            }
+            else
+                throw new ApplicationException("Not allowed to delete another users blog.");
         }
 
         public Post Update(Post updatedPost)
         {
             // TODO: prevent user from updating a blog that isn't theirs
-            return _postRepository.Update(updatedPost);
+            var currentUserId = _userService.CurrentUserId;
+            var blog = _blogRepository.Get(updatedPost.BlogId);
+
+            if (blog.UserId == currentUserId)
+            {
+                var newPost = _postRepository.Update(updatedPost);
+                return newPost;
+            }
+            else
+                throw new ApplicationException("Not allowed to update another users blog.");
         }
 
     }
